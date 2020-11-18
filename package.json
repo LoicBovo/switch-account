@@ -1,0 +1,36 @@
+{
+  "name": "switch-account",
+  "version": "1.0.0",
+  "description": "help switching between aws accounts",
+  "main": "./out/index.js",
+  "scripts": {
+    "prestart": "npm run build",
+    "start": "node out/index.js",
+    "test": "test",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LoicBovo/switch-account.git"
+  },
+  "keywords": [
+    "aws",
+    "iam",
+    "accounts"
+  ],
+  "author": "loic.bovo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LoicBovo/switch-account/issues"
+  },
+  "homepage": "https://github.com/LoicBovo/switch-account#readme",
+  "dependencies": {
+    "@types/aws-sdk": "^2.7.0",
+    "@types/node": "^14.14.7",
+    "aws-sdk": "^2.791.0",
+    "readline": "^1.3.0"
+  },
+  "bin": {
+    "switch-account": "./out/index.js"
+  }
+}
