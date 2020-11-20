@@ -25,10 +25,6 @@ currently solution exists but they break aws cli which is not ideal
 npm init
 ```
 
-
-
-
-
 ## build typesript 
 
 ```bash
@@ -48,37 +44,31 @@ npm install -g .
 ## configure the tool
 
 
+### creat a new iam account 
 
-### add aws account 
-
-```bash
-switch-account add-product [productname]=[aws-role-arn]
+The configuration follow
+```
+iam-account
+    |
+    |- mfa
+    |
+    |-aws-account
+        |
+        |-
 ```
 
 
-
-### add mfa device
-
-```bash
-switch-account add-mfa [aws-mfa-device-arn]
+```javascript
+case "add-iam": // this is adding a new iam accounts
+    AddIamAccount(config);
+    break;
+case "add-account": // this is adding a new aws account
+    AddAccount(config);
+    break;
+case "set-default": // this is setting an iam account as default
+    SetDefault();
+    break;
+default: // this is doing the magic
+    Switch(config);
+    break;
 ```
-
-
-
-## switch !
-
-```bash
-switch-account
-```
-
-
-
-## Copy paste the export
-
-For now you will have to copy paste the result printed into the command line prompt
-
-
-# todo
-
-need to add yargs in order to better handle arguments passed to the console
-__https://nodejs.org/en/knowledge/command-line/how-to-parse-command-line-arguments/__
