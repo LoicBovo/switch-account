@@ -1,22 +1,29 @@
 #!/usr/local/bin/node
 
-import { Configuration } from "./shared/objects/config/Configuration";
 import os from "os";
-import { AddIamAccount, AddAccount, Switch, SetDefault } from "./CommandRunner";
 import * as dotenv from 'dotenv';
 
+import { Configuration } from "./shared/objects/config/Configuration";
+import { AddLoginAccount, AddCloudAccount, Switch, SetDefault } from "./CommandRunner";
+import { ConfigurationInt } from "./shared/api/config/ConfigurationInt";
+
 dotenv.config({ path: `${os.homedir()}/.aws/.env` });
+const fileName = "switchAccount.json"
+const filePath = `${os.homedir()}/.aws/`;
+let config : ConfigurationInt;
 
-let config = new Configuration("switchAccount.json", `${os.homedir()}/.aws/`);
+// create aws configuration type
+config = new Configuration(fileName, filePath);
 
+// load existing configuration if any
 config.Load();
 
 switch (process.argv[2]) {
 	case "add-iam":
-		AddIamAccount(config);
+		AddLoginAccount(config);
 		break;
 	case "add-account":
-		AddAccount(config);
+		AddCloudAccount(config);
 		break;
 	case "set-default":
 		SetDefault();

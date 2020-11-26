@@ -1,5 +1,6 @@
+import { CloudAccountInt } from "../../api/config/CloudAccountInt";
 
-export class AwsAccount {
+export class AwsAccount implements CloudAccountInt {
     DefaultRegion: string;
     Name : string;
     RoleArn : string;

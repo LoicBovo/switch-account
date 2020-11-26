@@ -1,13 +1,16 @@
 import yargs from "yargs/yargs";
-
-import { Configuration } from "./shared/objects/config/Configuration";
 import readline from "readline";
 import { AssumeRole } from "./shared/api/aws/aws";
-import { WriteCredentialsToFile } from "./shared/api/config/ConfigurationFile";
 import os from 'os';
 import fs from 'fs';
+import { ConfigurationInt } from "./shared/api/config/ConfigurationInt";
+import { LoginAccountInt } from "./shared/api/config/LoginAccountInt";
+import { AwsIamAccount } from "./shared/objects/config/AwsIamAccount";
+import { CommandInt } from "./shared/api/command/CommandInt";
 
-const argv = yargs(process.argv.slice(2)).options({
+let argv : CommandInt;
+
+argv = yargs(process.argv.slice(2)).options({
     iamName: { type: "string" },
 	iamProfile: { type: "string" },
 	acctName: { type: "string" },
@@ -16,8 +19,10 @@ const argv = yargs(process.argv.slice(2)).options({
 	iamMfa: { type: "string" },
 }).argv;
 
-export function AddIamAccount(config: Configuration) {
+export function AddLoginAccount(config: ConfigurationInt) {
 	let name: string, mfa: string, profileName: string;
+	let loginAccount : LoginAccountInt;
+
 	if (!argv.iamName || !argv.iamMfa || !argv.iamProfile)
 		throw `argument missing, need to following ones iamName, iamMfa, iamProfile`;
 
@@ -25,10 +30,12 @@ export function AddIamAccount(config: Configuration) {
 	mfa = argv.iamMfa;
 	profileName = argv.iamProfile;
 
-	config.AddAwsIamAccount(name, mfa, profileName);
+	loginAccount = new AwsIamAccount(name, mfa, profileName)
+
+	config.AddLoginAccount(loginAccount);
 }
 
-export function AddAccount(config: Configuration) {
+export function AddCloudAccount(config: ConfigurationInt) {
 	let iamName:string, role:string, region:string, acctName: string;
 
 	if (!argv.iamName || !argv.role || !argv.region || !argv.acctName)
@@ -39,10 +46,10 @@ export function AddAccount(config: Configuration) {
 	region = argv.region;
 	acctName = argv.acctName;
 
-	config.GetAwsIamAccount(iamName).AddAwsAccount(acctName, region, role);
+	config.GetLoginAccount(iamName).AddAwsAccount(acctName, region, role);
 }
 
-export function Switch (config : Configuration) {
+export function Switch (config : ConfigurationInt) {
     
 
     let iamName: string, acctName: string;
@@ -67,10 +74,10 @@ export function Switch (config : Configuration) {
 
         AssumeRole(
             config
-                .GetAwsIamAccount(iamName)
+                .GetLoginAccount(iamName)
                 .GetAssumeRoleRequest(acctName, answer)
         ).then((resp) => {
-            WriteCredentialsToFile(resp, acctName);
+            config.WriteCredentialsToFile(resp, acctName);
         });
     });
 }

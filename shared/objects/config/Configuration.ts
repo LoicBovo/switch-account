@@ -1,55 +1,79 @@
-import { AwsIamAccount } from "./AwsIamAccount";
 import fs from "fs";
+import os from "os";
 
-export class Configuration {
-	AwsIamAccounts: AwsIamAccount[];
+import { AssumeRoleResponse } from "aws-sdk/clients/sts";
+
+import { AwsIamAccount } from "./AwsIamAccount";
+import { ConfigurationInt } from "../../api/config/ConfigurationInt";
+import { LoginAccountInt } from "../../api/config/LoginAccountInt";
+
+export class Configuration implements ConfigurationInt {
+	LoginAccounts: LoginAccountInt[];
 	FileName: string;
 	FilePath: string;
 	FileFullName: string;
 	constructor(fileName: string, filePath: string) {
-		this.AwsIamAccounts = [];
+		this.LoginAccounts = [];
 		this.FileName = fileName;
 		this.FilePath = filePath;
 		this.FileFullName = this.FilePath + this.FileName;
 	}
 
 	Load() {
-        const data = fs.readFileSync(this.FileFullName);
+		const data = fs.readFileSync(this.FileFullName);
 
-        const awsIamAccounts = JSON.parse(data.toString());
-        
-        awsIamAccounts.forEach((element:AwsIamAccount) => {
-            this.AwsIamAccounts.push(new AwsIamAccount(element.MfaSerial,element.Name, element.ProfileName));
-            this.AwsIamAccounts[this.AwsIamAccounts.length-1].LoadAwsAccounts(element.AwsAccounts);
-        });
+		const awsIamAccounts = JSON.parse(data.toString());
+
+		awsIamAccounts.forEach((element: LoginAccountInt) => {
+			this.LoginAccounts.push(
+				new AwsIamAccount(element.MfaSerial, element.Name, element.ProfileName)
+			);
+			this.LoginAccounts[this.LoginAccounts.length - 1].LoadAwsAccounts(
+				element.AwsAccounts
+			);
+		});
 	}
 	Save() {
 		fs.writeFile(
 			this.FileFullName,
-			JSON.stringify(this.AwsIamAccounts),
+			JSON.stringify(this.LoginAccounts),
 			(err) => {
 				console.error(err);
 				throw err;
 			}
 		);
-    }
-    
-    AddAwsIamAccount(name:string, mfaSerial: string, profileName: string) : AwsIamAccount {
-        
-        let awsIamAccount = new AwsIamAccount(mfaSerial,name, profileName);
+	}
 
-        this.AwsIamAccounts.push(awsIamAccount);
+	AddLoginAccount(
+		loginAccount : LoginAccountInt
+	): LoginAccountInt {
+		
+		this.LoginAccounts.push(loginAccount);
 
-        return this.AwsIamAccounts[this.AwsIamAccounts.length-1]
-    }
-    GetAwsIamAccount(name:string): AwsIamAccount {
+		return this.LoginAccounts[this.LoginAccounts.length - 1];
+	}
+	GetLoginAccount(name: string): LoginAccountInt {
+		for (let i = 0; i < this.LoginAccounts.length; i++) {
+			if (this.LoginAccounts[i].Name == name) {
+				return this.LoginAccounts[i];
+			}
+		}
 
-        for(let i = 0; i < this.AwsIamAccounts.length; i++){
-            if(this.AwsIamAccounts[i].Name == name){
-                return this.AwsIamAccounts[i];  
-            } 
-        }
+		throw `account ${name} does not exist`;
+	}
 
-        throw `account ${name} does not exist`;
+	WriteCredentialsToFile(
+		assumeRoleResponse: AssumeRoleResponse,
+		profileName: string
+	) {
+		let config: string;
+
+		config = `[profile ${profileName}]
+	aws_access_key_id=${assumeRoleResponse.Credentials?.AccessKeyId}
+	aws_secret_access_key=${assumeRoleResponse.Credentials?.SecretAccessKey}
+	aws_session_token=${assumeRoleResponse.Credentials?.SessionToken}`;
+
+		console.info("overwritting files in config");
+		fs.writeFileSync(`${os.homedir()}/.aws/config`, config);
 	}
 }

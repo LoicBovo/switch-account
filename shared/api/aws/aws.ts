@@ -2,7 +2,7 @@ import { STS } from "aws-sdk";
 import { AssumeRoleRequest } from "../../objects/aws/AssumeRoleRequest";
 
 export function AssumeRole(
-	assumeRoleRequest: AssumeRoleRequest
+	assumeRoleRequest: STS.AssumeRoleRequest
 ): Promise<STS.AssumeRoleResponse> {
 	return new Promise((resolve, reject) => {
 		let stsClient = new STS();

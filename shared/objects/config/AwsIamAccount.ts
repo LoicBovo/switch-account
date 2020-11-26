@@ -1,11 +1,13 @@
+import { LoginAccountInt } from "../../api/config/LoginAccountInt";
 import { AssumeRoleRequest } from "../aws/AssumeRoleRequest";
 import { AwsAccount } from "./AwsAccount";
 
-export class AwsIamAccount {
+export class AwsIamAccount implements LoginAccountInt {
     AwsAccounts: AwsAccount[];
     ProfileName: string;
 	MfaSerial: string;
     Name: string;
+    
 	constructor(mfaSerial: string, name: string, profileName: string) {
 		this.AwsAccounts = [];
         this.MfaSerial = mfaSerial;
