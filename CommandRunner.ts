@@ -51,7 +51,6 @@ export function AddCloudAccount(config: ConfigurationInt) {
 
 export function Switch (config : ConfigurationInt) {
     
-
     let iamName: string, acctName: string;
 
     if(argv.iamName) iamName = argv.iamName;

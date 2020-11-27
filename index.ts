@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv';
 import { Configuration } from "./shared/objects/config/Configuration";
 import { AddLoginAccount, AddCloudAccount, Switch, SetDefault } from "./CommandRunner";
 import { ConfigurationInt } from "./shared/api/config/ConfigurationInt";
+import { AwsIamFactory } from "./shared/objects/factory/AwsIamFactory";
 
 dotenv.config({ path: `${os.homedir()}/.aws/.env` });
 const fileName = "switchAccount.json"
@@ -16,7 +17,7 @@ let config : ConfigurationInt;
 config = new Configuration(fileName, filePath);
 
 // load existing configuration if any
-config.Load();
+config.Load(new AwsIamFactory());
 
 switch (process.argv[2]) {
 	case "add-iam":

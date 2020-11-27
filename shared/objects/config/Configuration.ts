@@ -6,6 +6,7 @@ import { AssumeRoleResponse } from "aws-sdk/clients/sts";
 import { AwsIamAccount } from "./AwsIamAccount";
 import { ConfigurationInt } from "../../api/config/ConfigurationInt";
 import { LoginAccountInt } from "../../api/config/LoginAccountInt";
+import { LoginFactoryInt } from "../../api/factory/LoginFactoryInt";
 
 export class Configuration implements ConfigurationInt {
 	LoginAccounts: LoginAccountInt[];
@@ -19,14 +20,14 @@ export class Configuration implements ConfigurationInt {
 		this.FileFullName = this.FilePath + this.FileName;
 	}
 
-	Load() {
+	Load(loginFactory: LoginFactoryInt) {
 		const data = fs.readFileSync(this.FileFullName);
 
 		const awsIamAccounts = JSON.parse(data.toString());
 
 		awsIamAccounts.forEach((element: LoginAccountInt) => {
 			this.LoginAccounts.push(
-				new AwsIamAccount(element.MfaSerial, element.Name, element.ProfileName)
+				loginFactory.CreateObject(element.MfaSerial, element.Name, element.ProfileName)
 			);
 			this.LoginAccounts[this.LoginAccounts.length - 1].LoadAwsAccounts(
 				element.AwsAccounts

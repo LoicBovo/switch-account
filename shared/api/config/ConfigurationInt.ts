@@ -1,5 +1,6 @@
 import { LoginAccountInt } from "./LoginAccountInt";
 import {STS} from 'aws-sdk';
+import { LoginFactoryInt } from "../factory/LoginFactoryInt";
 
 export interface ConfigurationInt {
     LoginAccounts: LoginAccountInt[];
@@ -7,7 +8,7 @@ export interface ConfigurationInt {
 	FilePath: string;
     FileFullName: string;
 
-    Load(): void;
+    Load(loginFactory: LoginFactoryInt): void;
 	Save(): void;
     AddLoginAccount(loginAccount : LoginAccountInt) : void;
     GetLoginAccount(name:string): LoginAccountInt;
