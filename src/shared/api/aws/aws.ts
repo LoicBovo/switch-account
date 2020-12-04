@@ -1,5 +1,5 @@
 import { STS } from "aws-sdk";
-import { AssumeRoleRequest } from "../../objects/aws/AssumeRoleRequest";
+import { AssumeRoleRequest } from "../../../objects/aws/AssumeRoleRequest";
 
 export function AssumeRole(
 	assumeRoleRequest: STS.AssumeRoleRequest

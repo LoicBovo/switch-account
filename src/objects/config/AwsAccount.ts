@@ -1,4 +1,4 @@
-import { CloudAccountInt } from "../../api/config/CloudAccountInt";
+import { CloudAccountInt } from "../../shared/api/config/CloudAccountInt";
 
 export class AwsAccount implements CloudAccountInt {
     DefaultRegion: string;

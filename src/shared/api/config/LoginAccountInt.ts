@@ -4,6 +4,8 @@ import { CloudAccountInt } from "./CloudAccountInt";
 export interface LoginAccountInt {
     AwsAccounts: CloudAccountInt[];
     ProfileName: string;
+    AccessKey: string;
+    SecretKey: string;
 	MfaSerial: string;
     Name: string;
 

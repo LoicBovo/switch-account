@@ -3,10 +3,10 @@
 import os from "os";
 import * as dotenv from 'dotenv';
 
-import { Configuration } from "./shared/objects/config/Configuration";
+import { Configuration } from "./objects/config/Configuration";
 import { AddLoginAccount, AddCloudAccount, Switch, SetDefault } from "./CommandRunner";
 import { ConfigurationInt } from "./shared/api/config/ConfigurationInt";
-import { AwsIamFactory } from "./shared/objects/factory/AwsIamFactory";
+import { AwsIamFactory } from "./objects/factory/AwsIamFactory";
 
 dotenv.config({ path: `${os.homedir()}/.aws/.env` });
 const fileName = "switchAccount.json"

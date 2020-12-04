@@ -4,9 +4,9 @@ import os from "os";
 import { AssumeRoleResponse } from "aws-sdk/clients/sts";
 
 import { AwsIamAccount } from "./AwsIamAccount";
-import { ConfigurationInt } from "../../api/config/ConfigurationInt";
-import { LoginAccountInt } from "../../api/config/LoginAccountInt";
-import { LoginFactoryInt } from "../../api/factory/LoginFactoryInt";
+import { ConfigurationInt } from "../../shared/api/config/ConfigurationInt";
+import { LoginAccountInt } from "../../shared/api/config/LoginAccountInt";
+import { LoginFactoryInt } from "../../shared/api/factory/LoginFactoryInt";
 
 export class Configuration implements ConfigurationInt {
 	LoginAccounts: LoginAccountInt[];
@@ -27,7 +27,7 @@ export class Configuration implements ConfigurationInt {
 
 		awsIamAccounts.forEach((element: LoginAccountInt) => {
 			this.LoginAccounts.push(
-				loginFactory.CreateObject(element.MfaSerial, element.Name, element.ProfileName)
+				loginFactory.CreateObject(element.MfaSerial, element.Name, element.ProfileName, element.AccessKey, element.SecretKey)
 			);
 			this.LoginAccounts[this.LoginAccounts.length - 1].LoadAwsAccounts(
 				element.AwsAccounts
@@ -53,6 +53,7 @@ export class Configuration implements ConfigurationInt {
 
 		return this.LoginAccounts[this.LoginAccounts.length - 1];
 	}
+
 	GetLoginAccount(name: string): LoginAccountInt {
 		for (let i = 0; i < this.LoginAccounts.length; i++) {
 			if (this.LoginAccounts[i].Name == name) {
@@ -63,7 +64,16 @@ export class Configuration implements ConfigurationInt {
 		throw `account ${name} does not exist`;
 	}
 
-	WriteCredentialsToFile(
+	WriteCredentialsFile(accessKey:string, secretKey:string) {
+		let credentials: string;
+		credentials= `[default]
+aws_access_key_id=${accessKey}
+aws_secret_access_key=${secretKey}`;
+
+		fs.writeFileSync(`${os.homedir()}/.aws/credentials`, credentials);
+	}
+
+	WriteConfigFile(
 		assumeRoleResponse: AssumeRoleResponse,
 		profileName: string
 	) {

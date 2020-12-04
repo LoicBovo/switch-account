@@ -5,8 +5,9 @@ import os from 'os';
 import fs from 'fs';
 import { ConfigurationInt } from "./shared/api/config/ConfigurationInt";
 import { LoginAccountInt } from "./shared/api/config/LoginAccountInt";
-import { AwsIamAccount } from "./shared/objects/config/AwsIamAccount";
+import { AwsIamAccount } from "./objects/config/AwsIamAccount";
 import { CommandInt } from "./shared/api/command/CommandInt";
+import { ADDRCONFIG } from "dns";
 
 let argv : CommandInt;
 
@@ -17,20 +18,24 @@ argv = yargs(process.argv.slice(2)).options({
 	role: { type: "string" },
 	region: { type: "string" },
 	iamMfa: { type: "string" },
+	accessKey: { type: "string"},
+	secretKey: {type: "string"}
 }).argv;
 
 export function AddLoginAccount(config: ConfigurationInt) {
-	let name: string, mfa: string, profileName: string;
+	let name: string, mfa: string, profileName: string, accessKey: string, secretKey: string;
 	let loginAccount : LoginAccountInt;
 
-	if (!argv.iamName || !argv.iamMfa || !argv.iamProfile)
-		throw `argument missing, need to following ones iamName, iamMfa, iamProfile`;
+	if (!argv.iamName || !argv.iamMfa || !argv.iamProfile || !argv.accessKey || !argv.secretKey)
+		throw `argument missing, need to following ones iamName, iamMfa, iamProfile, access key, secretkey`;
 
 	name = argv.iamName;
 	mfa = argv.iamMfa;
 	profileName = argv.iamProfile;
+	accessKey = argv.accessKey;
+	secretKey = argv.secretKey;
 
-	loginAccount = new AwsIamAccount(name, mfa, profileName)
+	loginAccount = new AwsIamAccount(name, mfa, profileName,accessKey, secretKey);
 
 	config.AddLoginAccount(loginAccount);
 }
@@ -60,7 +65,12 @@ export function Switch (config : ConfigurationInt) {
 	if (!argv.acctName)
 		throw `argument missing, need to following ones !argv.iamName || !argv.acctName`;
 
-	
+	// write credentials file
+	config.WriteCredentialsFile(config
+		.GetLoginAccount(iamName).AccessKey, config
+		.GetLoginAccount(iamName).SecretKey);
+
+
 	acctName = argv.acctName;
     
     let rl = readline.createInterface({
@@ -76,13 +86,14 @@ export function Switch (config : ConfigurationInt) {
                 .GetLoginAccount(iamName)
                 .GetAssumeRoleRequest(acctName, answer)
         ).then((resp) => {
-            config.WriteCredentialsToFile(resp, acctName);
+            config.WriteConfigFile(resp, acctName);
         });
-    });
+	});
+
 }
 
 export function SetDefault() {
-    if(!argv.iamName) throw `method require iamName`;
+    if(!argv.iamName) throw `method requires iamName`;
 
     fs.writeFileSync(`${os.homedir()}/.aws/.env`, `defaultIam=${argv.iamName}`);
 }

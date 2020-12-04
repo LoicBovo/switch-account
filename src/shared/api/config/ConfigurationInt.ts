@@ -12,5 +12,6 @@ export interface ConfigurationInt {
 	Save(): void;
     AddLoginAccount(loginAccount : LoginAccountInt) : void;
     GetLoginAccount(name:string): LoginAccountInt;
-    WriteCredentialsToFile(assumeRoleResponse: STS.AssumeRoleResponse,profileName: string) : void;
+    WriteConfigFile(assumeRoleResponse: STS.AssumeRoleResponse,profileName: string) : void;
+    WriteCredentialsFile(accessKey:string, secretKey: string): void;
 }

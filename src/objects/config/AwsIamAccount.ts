@@ -1,18 +1,22 @@
-import { LoginAccountInt } from "../../api/config/LoginAccountInt";
+import { LoginAccountInt } from "../../shared/api/config/LoginAccountInt";
 import { AssumeRoleRequest } from "../aws/AssumeRoleRequest";
 import { AwsAccount } from "./AwsAccount";
 
 export class AwsIamAccount implements LoginAccountInt {
     AwsAccounts: AwsAccount[];
     ProfileName: string;
+    AccessKey : string; //aws_access_key_id
+    SecretKey: string;
 	MfaSerial: string;
     Name: string;
     
-	constructor(mfaSerial: string, name: string, profileName: string) {
+	constructor(mfaSerial: string, name: string, profileName: string, accesskey: string, secretKey: string) {
 		this.AwsAccounts = [];
         this.MfaSerial = mfaSerial;
         this.Name = name;
         this.ProfileName = profileName;
+        this.AccessKey = accesskey;
+        this.SecretKey = secretKey;
     }
     
     AddAwsAccount(name: string, defaultRegion: string, roleArn : string) : AwsAccount {
